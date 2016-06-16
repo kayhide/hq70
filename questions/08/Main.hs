@@ -3,17 +3,16 @@ type Pos = (Int, Int)
 type Route = [Pos]
 
 patterns :: Int -> Route -> [Route]
-patterns i route@(pos@(x,y):poss)
-    | pos `elem` poss = []
-    | i == 0 = [route]
-    | otherwise =
-      (patterns j $ (x - 1, y) : route) ++
-      (patterns j $ (x + 1, y) : route) ++
-      (patterns j $ (x, y - 1) : route) ++
-      (patterns j $ (x, y + 1) : route)
+patterns 0 route = [route]
+patterns i route = foldl (++) [] $ map (patterns j) $ map (:route) $ nextPoss route
     where
         j = i - 1
 
+nextPoss :: Route -> [Pos]
+nextPoss route@((x,y):_) = (not . (`elem` route)) candidates
+    where
+        candidates = [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]
+
 main :: IO ()
 main = do
-    putStrLn $ show $ patterns 12 [(0, 0)]
+    putStrLn $ show $ length $ patterns 12 [(0, 0)]
