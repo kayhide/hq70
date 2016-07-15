@@ -21,4 +21,4 @@ isValid clubs = (sum $ map snd clubs) <= memberCountLimit
 
 main :: IO ()
 main = do
-    putStrLn $ show $ maximum $ fmap totalArea $ filter isValid $ subsequences allClubs
+    print $ maximum $ fmap totalArea $ filter isValid $ subsequences allClubs
