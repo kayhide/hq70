@@ -42,5 +42,19 @@ run = do
     guard $ isSquareValid len
     validTris len
 
+run' :: [Tri]
+run' = do
+    len <- allLengths
+    guard $ isSquareValid len
+    let quarter = len `div` 4
+    delta1 <- [1..(quarter - 1)]
+    delta2 <- [delta1..(quarter - 1)]
+    let quarterSquared = quarter ^ 2
+        delta1Squared = delta1 ^ 2
+        delta2Squared = delta2 ^ 2
+    guard $ delta1Squared + delta2Squared == quarterSquared
+    pure (quarterSquared, quarterSquared - delta1Squared, quarterSquared - delta2Squared)
+
 main :: IO ()
-main = print $ length $ exceptSimilar run
+main = print $ length $ exceptSimilar run'
+
