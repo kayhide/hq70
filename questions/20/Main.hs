@@ -21,6 +21,19 @@ counts = do
   g <- groups
   return (head g, length g)
 
+
+type CountList = [Int]
+
+shiftAdd :: CountList -> Int -> CountList
+shiftAdd xs n = zipWith (+) (xs ++ zeros) (zeros ++ xs)
+  where zeros = replicate n 0
+
+totalCounts :: CountList
+totalCounts = foldl shiftAdd [1] allNums
+
+counts' :: [SumCount]
+counts' = zipWith (,) [0..] totalCounts
+
 main :: IO ()
 main = do
-  print $ maximumBy (compare `on` snd) counts
+  print $ maximumBy (compare `on` snd) counts'
