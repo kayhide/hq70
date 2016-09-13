@@ -1,19 +1,15 @@
+import Control.Monad
+
 isPalindrome :: String -> Bool
 isPalindrome s = reverse s == s
 
 toBinary :: Int -> String
-toBinary 0 = ""
-toBinary n = (toBinary $ n `div` 2) ++ show (n `mod` 2)
+toBinary = foldl (\a e -> show (e `mod` 2) ++ a) "" . takeWhile (>0) . iterate (`div` 2)
 
 toDecimal :: String -> Int
-toDecimal = foldl (\res x -> 2 * res + read [x]) 0
+toDecimal = foldl (\a e -> 2 * a + read [e]) 0
 
 type Date = (Int, Int, Int)
-
-makeDate :: Int -> Int -> Int -> Date
-makeDate x y z = (x, y, z)
-
-dates = makeDate <$> [1964..2020] <*> [1..12] <*> [1..31]
 
 dateToInt :: Date -> Int
 dateToInt (y, m, d) = y * 10000 + m * 100 + d
@@ -26,7 +22,12 @@ isValidDate (2020, 7, d) = (d <= 24)
 isValidDate (2020, m, _) = (m < 7)
 isValidDate _ = True
 
+dates :: [Date]
+dates = do
+  date <- (,,) <$> [1964..2020] <*> [1..12] <*> [1..31]
+  guard $ isValidDate date
+  return date
+
 main :: IO ()
 main = do
-    putStrLn $ show $ filter (isPalindrome . toBinary) $ map dateToInt $ filter isValidDate dates
-
+     print $ filter (isPalindrome . toBinary) $ dateToInt <$> dates
