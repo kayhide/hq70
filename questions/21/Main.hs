@@ -10,11 +10,14 @@ nextPascal row = zipWith xor (False:row) (row ++ [False])
 countFalse :: PascalStack -> Int
 countFalse = sum . fmap (length . filter not)
 
-run :: PascalStack -> PascalStack
-run stack@(x:xs)
-  | (countFalse stack) < 2014 = run $ (nextPascal x):stack
+run :: Int -> PascalStack -> PascalStack
+run n stack@(x:xs)
+  | (countFalse stack) < n = run n $ (nextPascal x):stack
   | otherwise = stack
+
+search :: Int -> Int
+search n = length $ run n [[True]]
 
 main :: IO ()
 main = do
-  print $ length $ run [[True]]
+  print $ search 2014
