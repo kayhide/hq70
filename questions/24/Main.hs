@@ -1,4 +1,5 @@
 import Data.List
+import Data.Monoid
 
 data Shot = Single Int | Double Int Int deriving (Show)
 
@@ -45,5 +46,19 @@ pitch shots = do
   x <- shots
   fmap (x:) $ pitch (except x shots)
 
+main' :: IO ()
+main' = print $ length $ pitch allShots
+
+-- |
+-- >>> pitchM [Single 1,Single 2]
+-- Sum {getSum = 2}
+-- >>> pitchM [Single 1,Single 2,Double 1 2]
+-- Sum {getSum = 3}
+pitchM :: [Shot] -> Sum Int
+pitchM [] = Sum 1
+pitchM shots = mconcat $ do
+  x <- shots
+  return $ pitchM (except x shots)
+
 main :: IO ()
-main = print $ length $ pitch allShots
+main = print $ getSum $ pitchM allShots
