@@ -12,21 +12,15 @@ allShots = (Single <$> [1..9]) ++
 -- allShots = (Single <$> [1..3]) ++ [Double 1 2, Double 2 3]
 
 -- |
--- >>> numbers (Single 2)
--- [2]
--- >>> numbers (Double 2 3)
--- [2,3]
-numbers :: Shot -> [Int]
-numbers (Single x) = [x]
-numbers (Double x y) = [x, y]
-
--- |
 -- >>> isOverlapping (Single 2) (Double 2 3)
 -- True
 -- >>> isOverlapping (Double 2 3) (Double 3 6)
 -- True
 isOverlapping :: Shot -> Shot -> Bool
-isOverlapping x y = (not . null) $ intersect (numbers x) (numbers y)
+isOverlapping (Single x) (Single y) = x == y
+isOverlapping (Single x) (Double y1 y2) = x == y1 || x == y2
+isOverlapping (Double x1 x2) (Single y) = x1 == y || x2 == y
+isOverlapping (Double x1 x2) (Double y1 y2) = x1 == y1 || x1 == y2 || x2 == y1 || x2 == y2
 
 -- |
 -- >>> except (Single 2) [Single 1,Single 2,Double 2 3]
