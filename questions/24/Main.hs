@@ -7,8 +7,10 @@ type Possibilities = [Shot]
 type Sequence = [Shot]
 
 allShots :: Possibilities
-allShots = (Single <$> [1..9]) ++
-           ((uncurry Double) <$> [(1, 2), (1, 4), (2, 3), (3, 6), (4, 7), (6, 9), (7, 8), (8, 9)])
+allShots = singles ++ doubles
+  where singles = Single <$> [1..9]
+        doubles = (uncurry Double) <$> (zipWith (,) nums $ drop 1 $ cycle nums)
+        nums = [1, 2, 3, 6, 9, 7, 8, 4]
 -- allShots = (Single <$> [1..3]) ++ [Double 1 2, Double 2 3]
 
 -- |
@@ -55,5 +57,42 @@ pitchM shots = mconcat $ do
   x <- shots
   return $ pitchM (except x shots)
 
+main'' :: IO ()
+main'' = print $ getSum $ pitchM allShots
+
+-- |
+-- >>> numbers (Single 2)
+-- [2]
+-- >>> numbers (Double 2 3)
+-- [2,3]
+numbers :: Shot -> [Int]
+numbers (Single x) = [x]
+numbers (Double x y) = [x, y]
+
+-- |
+-- >>> isCompleted 2 [Single 1,Single 2]
+-- True
+-- >>> isCompleted 2 [Double 1 2]
+-- True
+-- >>> isCompleted 2 [Single 1]
+-- False
+isCompleted :: Int -> Possibilities -> Bool
+isCompleted n shots = n == length nums
+  where nums = mconcat $ fmap numbers shots
+
+-- |
+-- >>> shotCombinations [Single 1,Single 2,Double 1 2]
+-- [[Single 1,Single 2],[Double 1 2]]
+shotCombinations :: Possibilities -> [Possibilities]
+shotCombinations [] = [[]]
+shotCombinations shots@(x:xs) = filter (isCompleted count) combs
+  where count = length $ nub $ mconcat $ fmap numbers shots
+        combs = fmap (x:) (shotCombinations (except x xs)) ++ shotCombinations xs
+
+fact :: Integral a => a -> a
+fact n = foldl (*) 1 [1..n]
+
 main :: IO ()
-main = print $ getSum $ pitchM allShots
+main = print $ sum $ do
+  nums <- group $ sort $ fmap length $ shotCombinations allShots
+  return $ (length nums) * (fact (head nums))
