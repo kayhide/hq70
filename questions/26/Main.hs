@@ -1,49 +1,57 @@
 import Data.List
-
-data Cell = Void | Black | White deriving (Eq)
-
-instance Show Cell where
-  show Void = "□"
-  show Black = "◎"
-  show White = "◯"
+import Data.Maybe
+import Control.Monad
 
 type Position = (Int, Int)
-type Board = [(Position, Cell)]
+type Size = (Int, Int)
 
-size = (3, 2)
-width = fst size
-height = snd size
+data Motion = East | North | West | South deriving (Eq, Show, Enum)
+data Board = Board Position Position deriving (Eq, Show)
+
+type Path = [Motion]
+type PathAndBoard = (Path, Board)
+
+-- size = (3, 2)
+size = (10, 10)
 
 startPosition = (0, 0)
 goalPosition = (width - 1, height - 1)
+  where width = fst size
+        height = snd size
 
-goalBoard :: Board
-goalBoard = [ (goalPosition, Black)
-            , ((fst goalPosition - 1, snd goalPosition), Void)
-            ]
+startBoard :: Board
+startBoard = Board startPosition goalPosition
 
-cellAt :: Board -> Position -> Maybe Cell
-cellAt board pos = lookup pos board
+move :: Position -> Motion -> Position
+move (x, y) East = (x + 1, y)
+move (x, y) North = (x, y - 1)
+move (x, y) West = (x - 1, y)
+move (x, y) South = (x, y + 1)
 
-positionOf :: Board -> Cell -> Maybe Position
-positionOf board cell = fst <$> find ((==cell) . snd) board
+isIn :: Position -> Size -> Bool
+isIn (x, y) (w, h) = 0 <= x && x < w && 0 <= y && y < h
 
-formatBoard :: Board -> String
-formatBoard board = unlines $ do
-  y <- [0..(height -1)]
-  return $ concat $ do
-    x <- [0..(width - 1)]
-    let cell = cellAt board (x, y)
-      in
-      return $ cellToString cell
+isGoaled :: Board -> Bool
+isGoaled (Board posBlack _) = posBlack == goalPosition
 
-cellToString :: Maybe Cell -> String
-cellToString (Just cell) = show cell
-cellToString Nothing = show White
+moveVoid :: Board -> Motion -> Maybe Board
+moveVoid (Board posBlack posVoid) mo
+  | posVoid' == posBlack = Just (Board posVoid posVoid')
+  | posVoid' `isIn` size = Just (Board posBlack posVoid')
+  | otherwise = Nothing
+  where posVoid' = move posVoid mo
 
-displayBoard :: Board -> IO ()
-displayBoard = putStr . formatBoard
+solve :: [Board] -> (Board -> Bool) -> [PathAndBoard] -> PathAndBoard
+solve cache pred (head@(path, board):tail)
+  | pred board = head
+  | otherwise = solve cache' pred $ tail ++ next'
+  where next' = catMaybes $ do
+          mo <- enumFrom East
+          return $ do
+            board' <- moveVoid board mo
+            guard $ notElem board' cache
+            return ((mo:path), board')
+        cache' = fmap snd next' ++ cache
 
 main :: IO ()
-main = do
-    putStrLn "answer"
+main = print $ length $ fst $ solve [startBoard] isGoaled [([], startBoard)]
