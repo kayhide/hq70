@@ -1,5 +1,5 @@
 ```
 % time runghc Main.hs
 69
-runghc Main.hs  21.35s user 0.13s system 100% cpu 21.461 total
+runghc Main.hs  21.78s user 0.17s system 99% cpu 21.951 total
 ```

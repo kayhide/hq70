@@ -1,5 +1,6 @@
 import Data.List
 import Data.Maybe
+import Data.Sequence (viewl, fromList, singleton, (><), Seq, ViewL ((:<)))
 import Control.Monad
 
 type Position = (Int, Int)
@@ -10,6 +11,7 @@ data Board = Board Position Position deriving (Eq, Show)
 
 type Path = [Motion]
 type PathAndBoard = (Path, Board)
+type Queue = Seq PathAndBoard
 
 -- size = (3, 2)
 size = (10, 10)
@@ -41,17 +43,20 @@ moveVoid (Board posBlack posVoid) mo
   | otherwise = Nothing
   where posVoid' = move posVoid mo
 
-solve :: [Board] -> (Board -> Bool) -> [PathAndBoard] -> PathAndBoard
-solve cache pred (head@(path, board):tail)
+solve :: [Board] -> (Board -> Bool) -> Queue -> PathAndBoard
+solve cache pred queue
   | pred board = head
-  | otherwise = solve cache' pred $ tail ++ next'
-  where next' = catMaybes $ do
+  | otherwise = solve cache' pred tail'
+  where (head :< tail) = viewl queue
+        (path, board) = head
+        next' = catMaybes $ do
           mo <- enumFrom East
           return $ do
             board' <- moveVoid board mo
             guard $ notElem board' cache
             return ((mo:path), board')
         cache' = fmap snd next' ++ cache
+        tail' = tail >< fromList next'
 
 main :: IO ()
-main = print $ length $ fst $ solve [startBoard] isGoaled [([], startBoard)]
+main = print $ length $ fst $ solve [startBoard] isGoaled $ singleton ([], startBoard)
