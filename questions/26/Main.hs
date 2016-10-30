@@ -15,8 +15,8 @@ data Board = Board Position Position deriving (Eq, Show)
 type Path = [Motion]
 type PathAndBoard = (Path, Board)
 
-size = (3, 2)
--- size = (10, 10)
+-- size = (3, 2)
+size = (10, 10)
 width = fst size
 height = snd size
 
@@ -83,29 +83,25 @@ type Cache = [Board]
 -- ([([North],Board (0,0) (2,0)),([West],Board (0,0) (1,1))],[Board (0,0) (2,0),Board (0,0) (1,1)])
 nextWithCache :: PathAndBoard -> State Cache [PathAndBoard]
 nextWithCache (path, board) = do
-  cache <- trace "getting cache" get
-  -- cache <- get
-  let next' = catMaybes $! do
+  cache <- get
+  let next' = catMaybes $ do
         mo <- enumFrom East
         return $ do
           board' <- moveVoid board mo
-          guard $ trace "referencing cache" $ notElem board' cache
+          guard $ notElem board' cache
           return ((mo:path), board')
-  -- modify' $ trace "modifing cache" ((snd <$> next')++)
-  modify' ((snd <$> next')++)
+  modify (fmap snd next' ++)
   return next'
 
-queueWithCache :: State Cache [PathAndBoard]
-queueWithCache = do
-  queue' <- queueWithCache
-  next' <- sequence $ fmap nextWithCache queue'
-  return $ ([], startBoard) : concat next'
-
-find' = do
-  queue' <- queueWithCache
-  return $ fromJust $ find (isGoaled . snd) queue'
+queueWithCache :: [PathAndBoard] -> State Cache [PathAndBoard]
+queueWithCache current = do
+  nexts <- sequence $ fmap nextWithCache current
+  let next = concat nexts
+  (next ++) <$> queueWithCache next
 
 main = print $ length $ fst $ evalState find' []
+  where find' = fromJust . find (isGoaled . snd) <$> queueWithCache [([], startBoard)]
+
 
 
 caches :: [PathAndBoard] ->[[Board]]
