@@ -2,6 +2,8 @@
 
 import Data.List
 import Data.Maybe
+import Data.Set (Set)
+import qualified Data.Set as Set
 import Control.Monad
 import Control.Monad.State
 import Debug.Trace
@@ -10,7 +12,7 @@ type Position = (Int, Int)
 type Size = (Int, Int)
 
 data Motion = East | North | West | South deriving (Eq, Show, Enum)
-data Board = Board Position Position deriving (Eq, Show)
+data Board = Board Position Position deriving (Eq, Ord, Show)
 
 type Path = [Motion]
 type PathAndBoard = (Path, Board)
@@ -45,7 +47,7 @@ moveVoid (Board posBlack posVoid) mo
   | otherwise = Nothing
   where posVoid' = move posVoid mo
 
-type Cache = [Board]
+type Cache = Set Board
 
 nextWithCache :: PathAndBoard -> State Cache [PathAndBoard]
 nextWithCache (path, board) = do
@@ -54,9 +56,9 @@ nextWithCache (path, board) = do
         mo <- enumFrom East
         return $ do
           board' <- moveVoid board mo
-          guard $ notElem board' cache
+          guard $ Set.notMember board' cache
           return ((mo:path), board')
-  modify (fmap snd next' ++)
+  put $ foldr Set.insert cache $ fmap snd next'
   return next'
 
 queueWithCache :: [PathAndBoard] -> State Cache [PathAndBoard]
@@ -65,5 +67,5 @@ queueWithCache current = do
   let next = concat nexts
   (next ++) <$> queueWithCache next
 
-main = print $ length $ fst $ evalState find' []
+main = print $ length $ fst $ evalState find' Set.empty
   where find' = fromJust . find (isGoaled . snd) <$> queueWithCache [([], startBoard)]
