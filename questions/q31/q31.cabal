@@ -1,0 +1,51 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 60f6f73212105ec8f2cbc3e180e053fc92ca69e2ce47b7de9bef66426256bae0
+
+name:           q31
+version:        0.1.0.0
+category:       Web
+homepage:       https://github.com/kayhide/q31
+author:         Hideaki KAWAI
+maintainer:     kayhide@gmail.com
+copyright:      kayhide
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+
+executable q31
+  main-is: Main.hs
+  other-modules:
+      Paths_q31
+  hs-source-dirs:
+      src
+  default-extensions: AutoDeriveTypeable BangPatterns BinaryLiterals ConstraintKinds DataKinds DefaultSignatures DeriveAnyClass DeriveDataTypeable DeriveFoldable DeriveFunctor DeriveGeneric DeriveTraversable DoAndIfThenElse EmptyDataDecls ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs KindSignatures LambdaCase MultiParamTypeClasses MultiWayIf NamedFieldPuns NoImplicitPrelude OverloadedLists OverloadedStrings PartialTypeSignatures PatternGuards PolyKinds RankNTypes RecordWildCards ScopedTypeVariables StandaloneDeriving TupleSections TypeApplications TypeFamilies TypeSynonymInstances ViewPatterns
+  build-depends:
+      async
+    , base
+    , bytestring
+    , classy-prelude
+    , containers
+    , deepseq
+    , directory
+    , exceptions
+    , filepath
+    , lens
+    , mtl
+    , primitive
+    , stm
+    , text
+    , time
+    , transformers
+    , typed-process
+    , unliftio
+    , unliftio-core
+    , unordered-containers
+    , vector
+  default-language: Haskell2010
