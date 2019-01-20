@@ -1,0 +1,51 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 504005d5fc0711f421bd4c3be6551f0024e491d9247a8cfa68ca695cb2f6636a
+
+name:           q32
+version:        0.1.0.0
+category:       Web
+homepage:       https://github.com/kayhide/q32
+author:         Hideaki KAWAI
+maintainer:     kayhide@gmail.com
+copyright:      kayhide
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+
+executable q32
+  main-is: Main.hs
+  other-modules:
+      Paths_q32
+  hs-source-dirs:
+      src
+  default-extensions: AutoDeriveTypeable BangPatterns BinaryLiterals ConstraintKinds DataKinds DefaultSignatures DeriveAnyClass DeriveDataTypeable DeriveFoldable DeriveFunctor DeriveGeneric DeriveTraversable DoAndIfThenElse EmptyDataDecls ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs KindSignatures LambdaCase MultiParamTypeClasses MultiWayIf NamedFieldPuns NoImplicitPrelude OverloadedLists OverloadedStrings PartialTypeSignatures PatternGuards PolyKinds RankNTypes RecordWildCards ScopedTypeVariables StandaloneDeriving TupleSections TypeApplications TypeFamilies TypeSynonymInstances ViewPatterns
+  build-depends:
+      async
+    , base
+    , bytestring
+    , classy-prelude
+    , containers
+    , deepseq
+    , directory
+    , exceptions
+    , filepath
+    , lens
+    , mtl
+    , primitive
+    , stm
+    , text
+    , time
+    , transformers
+    , typed-process
+    , unliftio
+    , unliftio-core
+    , unordered-containers
+    , vector
+  default-language: Haskell2010
